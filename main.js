@@ -39,7 +39,7 @@ var jsApp = {
 		}
 		
 		// DEBUG: Render hitboxes.
-		me.debug.renderHitBox = true;
+		me.debug.renderHitBox = false;
 		
 		// Initialize the "audio"
 		me.audio.init("mp3,ogg");
@@ -70,6 +70,9 @@ var jsApp = {
 		me.input.bindKey(me.input.KEY.RIGHT, "right");
 		me.input.bindKey(me.input.KEY.UP, "up");
 		me.input.bindKey(me.input.KEY.DOWN, "down");
+		
+		me.input.bindKey(me.input.KEY.X, "mouse_move");
+		me.input.bindMouse(me.input.mouse.LEFT, me.input.KEY.X);
       
       // start the game 
 		me.state.change(me.state.PLAY);
@@ -91,6 +94,12 @@ var PlayScreen = me.ScreenObject.extend({
 		// TODO
 	}
 
+});
+
+var PointMass = me.ObjectEntity.extend({
+	init: function(x, y, settings) {
+		// TODO
+	}
 });
 
 // Borrowed from The Mana World project for a starting point.
@@ -174,6 +183,32 @@ var PlayerEntity = Character.extend({
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
 		
     },
+	
+	_steer: function(origin, target, slowdown) {
+		var steer;
+		maxSpeed = 5,
+		maxForce = 5;
+		
+		var desired = target.clone();
+		desired.sub(origin);
+		var d = desired.length();
+		
+		if (d > 0) {
+			// Two options for desired vector magnitude (1 -- based on distance, 2 -- maxSpeed)
+			if (slowdown && d < 100) {
+				desired.length(maxSpeed * (d / 100)); // This damping is somewhat arbitrary
+			} else {
+				desired.length(maxSpeed);
+			}
+			steer = desired.clone();
+			steer.sub(this.vel);
+			steer.length(Math.min(maxForce, steer.length()));
+		} else {
+			steer = new me.Vector2d(0, 0);
+		}
+		steer.normalize();
+		return steer;
+	},
 
     handleInput: function() {
         if (me.input.isKeyPressed('left'))
@@ -197,6 +232,16 @@ var PlayerEntity = Character.extend({
             this.vel.y = this.accel.y * me.timer.tick;
             this.direction = 'down';
         }
+		else if (me.input.isKeyPressed("mouse_move")) {
+			// Where are we headed?
+			var target = me.input.mouse.pos.clone();
+			target.add(me.game.viewport.pos);
+			var steer = this._steer(this.pos, target);
+			
+			// Apply steering vector to velocity.
+			this.vel.y = this.accel.y * steer.y
+			this.vel.x = this.accel.x * steer.x;
+		}
     }
 
 });
