@@ -105,7 +105,8 @@ var PointMass = me.ObjectEntity.extend({
 // Borrowed from The Mana World project for a starting point.
 var Character = me.ObjectEntity.extend({
 	
-	// Target that the character will move toward.
+	// Target that the character will move toward when using mouse/pointer
+	// movement.
 	target: null,
 	
     init: function(x, y, settings) {
@@ -129,8 +130,19 @@ var Character = me.ObjectEntity.extend({
         this.destinationY = y;
     },
 	
+	/**
+	 * Returns a vector that points from the origin to the target Vector2d 
+	 * object.
+	 *
+	 * @param origin Start point.
+	 * @param target End point.
+	 * @param slowdown Should the vector get smaller as we get closer to the target?
+	 *
+	 */
 	_steer: function(origin, target, slowdown) {
 		var steer;
+		
+		// TODO: Make these configurable from higher up.
 		maxSpeed = 5,
 		maxForce = 5;
 		
@@ -154,11 +166,36 @@ var Character = me.ObjectEntity.extend({
 		steer.normalize();
 		return steer;
 	},
+	
+	_handlePointerMovement: function() {
+		var distance = this.target.clone();
+		distance.sub(this.pos);
+		
+		// Are we there yet?  If not, move toward the target.
+		if(distance.length() > 1) {
+			
+			// Steer!
+			var steer = this._steer(this.pos, this.target, false);
+			
+			// Apply steering vector to velocity.
+			this.vel.y = this.accel.y * steer.y
+			this.vel.x = this.accel.x * steer.x;
+			
+			return true;
+		} else {
+			this.target = null;
+			return false;
+		}
+	},
 
     update: function() {
         hadSpeed = this.vel.y !== 0 || this.vel.x !== 0;
 		
+		// Gather current input.
         this.handleInput();
+		
+		// Use pointer movement (if applicable).
+		if(this.target != null) this._handlePointerMovement();
 		
         // check & update player movement
         updated = this.updateMovement();
@@ -219,22 +256,34 @@ var PlayerEntity = Character.extend({
         {
             this.vel.x -= this.accel.x * me.timer.tick;
             this.direction = 'left';
+			
+			// Cancel pointer movement.
+			this.target = null;
         }
         else if (me.input.isKeyPressed('right'))
         {
             this.vel.x += this.accel.x * me.timer.tick;
             this.direction = 'right';
+			
+			// Cancel pointer movement.
+			this.target = null;
         }
 
         if (me.input.isKeyPressed('up'))
         {
             this.vel.y = -this.accel.y * me.timer.tick;
             this.direction = 'up';
+			
+			// Cancel pointer movement.
+			this.target = null;
         }
         else if (me.input.isKeyPressed('down'))
         {
             this.vel.y = this.accel.y * me.timer.tick;
             this.direction = 'down';
+			
+			// Cancel pointer movement.
+			this.target = null;
         }
 		else if (me.input.isKeyPressed("mouse_move")) {
 			// Where are we headed?
@@ -246,12 +295,7 @@ var PlayerEntity = Character.extend({
 			var h = this.height / 2;
 			target.sub(new me.Vector2d(w,h));
 			
-			// Steer!
-			var steer = this._steer(this.pos, target, true);
-			
-			// Apply steering vector to velocity.
-			this.vel.y = this.accel.y * steer.y
-			this.vel.x = this.accel.x * steer.x;
+			this.target = target;
 		}
     }
 
