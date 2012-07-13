@@ -104,6 +104,10 @@ var PointMass = me.ObjectEntity.extend({
 
 // Borrowed from The Mana World project for a starting point.
 var Character = me.ObjectEntity.extend({
+	
+	// Target that the character will move toward.
+	target: null,
+	
     init: function(x, y, settings) {
         // call the parent constructor
         this.parent(x, y, settings);
@@ -124,6 +128,32 @@ var Character = me.ObjectEntity.extend({
         this.destinationX = x;
         this.destinationY = y;
     },
+	
+	_steer: function(origin, target, slowdown) {
+		var steer;
+		maxSpeed = 5,
+		maxForce = 5;
+		
+		var desired = target.clone();
+		desired.sub(origin);
+		var d = desired.length();
+		
+		if (d > 0) {
+			// Two options for desired vector magnitude (1 -- based on distance, 2 -- maxSpeed)
+			if (slowdown && d < 100) {
+				desired.length(maxSpeed * (d / 100)); // This damping is somewhat arbitrary
+			} else {
+				desired.length(maxSpeed);
+			}
+			steer = desired.clone();
+			steer.sub(this.vel);
+			steer.length(Math.min(maxForce, steer.length()));
+		} else {
+			steer = new me.Vector2d(0, 0);
+		}
+		steer.normalize();
+		return steer;
+	},
 
     update: function() {
         hadSpeed = this.vel.y !== 0 || this.vel.x !== 0;
@@ -183,32 +213,6 @@ var PlayerEntity = Character.extend({
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
 		
     },
-	
-	_steer: function(origin, target, slowdown) {
-		var steer;
-		maxSpeed = 5,
-		maxForce = 5;
-		
-		var desired = target.clone();
-		desired.sub(origin);
-		var d = desired.length();
-		
-		if (d > 0) {
-			// Two options for desired vector magnitude (1 -- based on distance, 2 -- maxSpeed)
-			if (slowdown && d < 100) {
-				desired.length(maxSpeed * (d / 100)); // This damping is somewhat arbitrary
-			} else {
-				desired.length(maxSpeed);
-			}
-			steer = desired.clone();
-			steer.sub(this.vel);
-			steer.length(Math.min(maxForce, steer.length()));
-		} else {
-			steer = new me.Vector2d(0, 0);
-		}
-		steer.normalize();
-		return steer;
-	},
 
     handleInput: function() {
         if (me.input.isKeyPressed('left'))
