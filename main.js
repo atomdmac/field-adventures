@@ -39,7 +39,7 @@ var jsApp = {
 		}
 		
 		// DEBUG: Render hitboxes.
-		me.debug.renderHitBox = false;
+		// me.debug.renderHitBox = true;
 		
 		// Initialize the "audio"
 		me.audio.init("mp3,ogg");
@@ -114,7 +114,7 @@ var Character = me.ObjectEntity.extend({
         this.setFriction(0.2, 0.2);
 
         // adjust the bounding box
-        this.updateColRect(0,32,0,32);
+        this.updateColRect(12,12,24,12);
 
         // disable gravity
         this.gravity = 0;
