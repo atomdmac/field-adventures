@@ -236,7 +236,14 @@ var PlayerEntity = Character.extend({
 			// Where are we headed?
 			var target = me.input.mouse.pos.clone();
 			target.add(me.game.viewport.pos);
-			var steer = this._steer(this.pos, target);
+			
+			// center the sprite.
+			var w = this.width / 2;
+			var h = this.height / 2;
+			target.sub(new me.Vector2d(w,h));
+			
+			// Steer!
+			var steer = this._steer(this.pos, target, true);
 			
 			// Apply steering vector to velocity.
 			this.vel.y = this.accel.y * steer.y
