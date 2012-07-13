@@ -114,7 +114,7 @@ var Character = me.ObjectEntity.extend({
         this.setFriction(0.2, 0.2);
 
         // adjust the bounding box
-        this.updateColRect(12,12,24,12);
+        this.updateColRect(10,12,16,14);
 
         // disable gravity
         this.gravity = 0;
