@@ -96,14 +96,6 @@ var PlayScreen = me.ScreenObject.extend({
 
 });
 
-var PointMass = me.ObjectEntity.extend({
-	mass: 10,
-	maxForce: 5,
-	init: function(x, y, settings) {
-		// TODO
-	}
-});
-
 // Borrowed from The Mana World project for a starting point.
 var Character = me.ObjectEntity.extend({
 	
