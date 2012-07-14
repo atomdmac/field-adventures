@@ -16,12 +16,12 @@ var g_resources= [{
 {
 	name: "test-map",
 	type: "tmx",
-	src: "data/test-map.tmx"
+	src: "data/16x16_test-map.tmx"
 },
 {
 	name: "player-sprite",
 	type: "image",
-	src: "data/sprite/32x32_player.png"
+	src: "data/sprite/16x16_player.png"
 }];
 
 
