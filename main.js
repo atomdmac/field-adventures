@@ -97,6 +97,8 @@ var PlayScreen = me.ScreenObject.extend({
 });
 
 var PointMass = me.ObjectEntity.extend({
+	mass: 10,
+	maxForce: 5,
 	init: function(x, y, settings) {
 		// TODO
 	}
@@ -116,8 +118,8 @@ var Character = me.ObjectEntity.extend({
         // set the walking speed
         this.setVelocity(2.5, 2.5);
 
-        this.setFriction(0.2, 0.2);
-
+        this.setFriction(0.5, 0.5);
+		
         // adjust the bounding box
         this.updateColRect(10,12,16,14);
 
@@ -143,8 +145,8 @@ var Character = me.ObjectEntity.extend({
 		var steer;
 		
 		// TODO: Make these configurable from higher up.
-		maxSpeed = 5,
-		maxForce = 5;
+		var maxSpeed = this.maxVel;
+		var maxForce = 5;
 		
 		var desired = target.clone();
 		desired.sub(origin);
@@ -153,7 +155,7 @@ var Character = me.ObjectEntity.extend({
 		if (d > 0) {
 			// Two options for desired vector magnitude (1 -- based on distance, 2 -- maxSpeed)
 			if (slowdown && d < 100) {
-				desired.length(maxSpeed * (d / 100)); // This damping is somewhat arbitrary
+				desired.length(maxSpeed.length() * (d / 100)); // This damping is somewhat arbitrary
 			} else {
 				desired.length(maxSpeed);
 			}
@@ -163,7 +165,6 @@ var Character = me.ObjectEntity.extend({
 		} else {
 			steer = new me.Vector2d(0, 0);
 		}
-		steer.normalize();
 		return steer;
 	},
 	
@@ -174,14 +175,16 @@ var Character = me.ObjectEntity.extend({
 		// Are we there yet?  If not, move toward the target.
 		if(distance.length() > 1) {
 			
-			// Steer!
-			var steer = this._steer(this.pos, this.target, false);
+			// Get a heading toward the pointer.
+			var steer = this._steer(this.pos, this.target, true);
+			steer.normalize();
 			
 			// Apply steering vector to velocity.
-			this.vel.y = this.accel.y * steer.y
-			this.vel.x = this.accel.x * steer.x;
+			this.vel.x += this.accel.x * steer.x * me.timer.tick;
+			this.vel.y += this.accel.y * steer.y * me.timer.tick;
 			
 			return true;
+			
 		} else {
 			this.target = null;
 			return false;
