@@ -32,7 +32,7 @@ var jsApp = {
 	onload: function()
 	{
 		// Initialize the stage.
-		if (!me.video.init('jsapp', 480, 480, false, 1.0))
+		if (!me.video.init('jsapp', 640, 480, false, 1.0))
 		{
 			alert("Sorry but your browser does not support html 5 canvas.");
 			return;
