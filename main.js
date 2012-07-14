@@ -14,12 +14,17 @@ var g_resources= [{
 	src: "data/tilesets/grass-tileset.png"
 },
 {
-	name: "test-map",
-	type: "tmx",
-	src: "data/16x16_test-map.tmx"
+	name: "helios-zelda-snes",
+	type: "image",
+	src: "data/tilesets/helios-zelda-snes.png"
 },
 {
-	name: "player-sprite",
+	name: "test-map",
+	type: "tmx",
+	src: "data/test-map.tmx"
+},
+{
+	name: "16x16_player",
 	type: "image",
 	src: "data/sprite/16x16_player.png"
 }];
@@ -39,7 +44,7 @@ var jsApp = {
 		}
 		
 		// DEBUG: Render hitboxes.
-		// me.debug.renderHitBox = true;
+		me.debug.renderHitBox = true;
 		
 		// Initialize the "audio"
 		me.audio.init("mp3,ogg");
@@ -113,7 +118,7 @@ var Character = me.ObjectEntity.extend({
         this.setFriction(0.5, 0.5);
 		
         // adjust the bounding box
-        this.updateColRect(10,12,16,14);
+        this.updateColRect(0,16,0,16);
 
         // disable gravity
         this.gravity = 0;
