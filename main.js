@@ -14,6 +14,11 @@ var g_resources= [{
 	src: "data/tilesets/grass-tileset.png"
 },
 {
+	name: "32x32_slants",
+	type: "image",
+	src: "data/tilesets/32x32_slants.png"
+},
+{
 	name: "test-map",
 	type: "tmx",
 	src: "data/test-map.tmx"
